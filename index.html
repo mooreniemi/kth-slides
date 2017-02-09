@@ -24,8 +24,130 @@
 	<body>
 		<div class="reveal">
 			<div class="slides">
-				<section>Slide 1</section>
-				<section>Slide 2</section>
+        <section>
+          kth cheapest wine in linear time
+          <iframe width="560" height="315" src="https://www.youtube.com/embed/mlg3H1StHpQ" frameborder="0" allowfullscreen></iframe>
+        </section>
+        <section>
+          <pre><code data-trim data-noescape>
+function cheat(array, k) {
+  return array.sort(function(a, b) {
+    return a - b;
+  })[k - 1];
+}
+          </code></pre>
+        </section>
+				<section>
+					<img src="http://mooreniemi.github.io/images/kth-element.png">
+				</section>
+				<section>
+					<ul>
+						<li>quickselect <span class="fragment">✓</span></li>
+						<li>median-of-medians</li>
+						<li>introselect</li>
+						<li>using soft heaps</li>
+					</ul>
+				</section>
+        <section>
+        <h1><a href="https://en.wikipedia.org/wiki/Quickselect">quickselect</a></h1>
+        <ul>
+        <li>Tony Hoare, 1961</li>
+        <li>in place</li>
+        <li>non-deterministic (our implementation today)</li>
+        <li>expected O(n)</li>
+        <li>worst case O(n²)</li>
+        </ul>
+        </section>
+				<section>
+					what do quicksort and quickselect have in common?
+
+          <pre class="fragment"><code data-trim data-noescape>
+function partition(array, from, to) {
+  var pivotIndex = getRandomInt(from, to),
+      pivot = array[pivotIndex];
+  swap(array, pivotIndex, to);
+  pivotIndex = from;
+
+  for(var i = from; i <= to; i++) {
+    if(array[i] < pivot) {
+      swap(array, pivotIndex, i);
+      pivotIndex++;
+    }
+  };
+  swap(array, pivotIndex, to);
+
+  return pivotIndex;
+};
+          </code></pre>
+				</section>
+				<section>
+what does partition do for us?
+          <pre><code data-trim data-noescape>
+// for pivot = 2
+// array before partition
+{ array: [ 9, 0, 1, 3, 2 ] }
+// array after partition
+{ array: [ 0, 1, 2, 3, 9 ] }
+
+// for pivot = 1
+// array before partition
+{ array: [ 2, 0, 9, 3, 1 ] }
+// array after partition
+{ array: [ 0, 1, 9, 3, 2 ] }
+          </code></pre>
+				</section>
+<section>
+what was the pivot value for this execution of partition?
+          <pre><code data-trim data-noescape>
+{ array: [ 9, 0, 1, 3, 2 ] }
+{ array: [ 0, 9, 1, 3, 2 ] }
+{ array: [ 0, 1, 9, 3, 2 ] }
+{ array: [ 0, 1, 2, 3, 9 ] }
+          </code></pre>
+</section>
+
+<section>
+what differentiates quickselect from quicksort?
+<img src="http://www.thecshandbook.com/public_html/img/uploads/quicksort.png" style="background-color:white; width:400px">
+<img src="http://3.bp.blogspot.com/-v4qzoAkApGE/VZvd-bYPuqI/AAAAAAAAC8M/CpWPKdpV2Bs/s1600/Screenshot%2B2015-07-07%2B19.39.35.png" style="width:400px">
+<br>
+<span class="fragment">we only need a single output from quickselect, so we can ignore a lot of the input!</span>
+</section>
+<section>
+          <pre><code data-trim data-noescape>
+function quickselectRecursive(array, from, to, statistic) {
+  var pivotIndex = partition(array, from, to);
+  if(pivotIndex === statistic) {
+    return array[pivotIndex];
+  } else if(pivotIndex < statistic) {
+    return quickselectRecursive(array, pivotIndex, to, statistic);
+  } else if(pivotIndex > statistic) {
+    return quickselectRecursive(array, from, pivotIndex, statistic);
+  }
+};
+          </code></pre>
+</section>
+
+<section>
+          <pre><code data-trim data-noescape>
+function quickselectIterative(array, k) {
+  var from = 0, to = array.length,
+      pivotIndex = partition(array, from, to);
+
+  while(pivotIndex !== k) {
+    pivotIndex = partition(array, from, to);
+    if(pivotIndex < k) {
+      from = pivotIndex;
+    } else if(pivotIndex > k) {
+      to = pivotIndex;
+    }
+  };
+
+  return array[pivotIndex];
+};
+          </code></pre>
+
+</section>
 			</div>
 		</div>
 
